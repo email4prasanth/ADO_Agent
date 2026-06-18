@@ -55,8 +55,8 @@
     - use ssh@adminuser@<publicip>, enter passsword
 ### Install tools
 ```sh
-vi bootstrap.sh
-chmod +x bootstrap.sh
+sudo vi bootstrap.sh
+sudo chmod +x bootstrap.sh
 sudo ./bootstrap.sh
 ./bootstrap.sh 2>&1 | tee bootstrap.log
 ```
