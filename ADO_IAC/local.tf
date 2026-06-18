@@ -58,4 +58,7 @@ locals {
     }
   }
   blob_storage = local.blob_storage_config[terraform.workspace]
+  key_vault_name = {
+    agent = "${terraform.workspace}-${local.project_name.name}-kv"
+  }
 }
