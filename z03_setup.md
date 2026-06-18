@@ -153,3 +153,7 @@ git push origin feature/intial-setup
     - Connection Name: ADOtoAzure
 - once the connection is done, open azure kv add the key value pair then go to access policies -> create select permission -- choose key secrets & certificate manager --> principal -->  choose the connection and create.
 - now open `AZURE_ACESS_GROUP_DEV` enable link from azure, provide subscription and keyvault name, resfresh click on add you will see the secrets.
+- open rg aiado-terraform-rg | Access control (IAM), click on add--> role assignment --> select Privileged administrator roles --> contributor access --> next --> User, group, or service principal--> select members **azuretoado** (application registration) and create.
+
+- open subscription `azlearn` folow the above steps
+- Now check the deployment of dev and qa(with branch protection rules)
