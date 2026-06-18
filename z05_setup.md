@@ -116,45 +116,40 @@ sudo ./bootstrap.sh
 
 #                                     AzureDevOps Part-2/2
 ## Creating azure-pipeline.yml
-### Clone the git hub  used for elastic bean stack 
-- create an empty folder `practice-ado` and open it by using powershell
+### Clone the git hub if required and push the code to ADO
+- create an empty folder `Base` and open it by using powershell
 ```
-git clone https://github.com/aws-samples/eb-tomcat-snakes.git myjavaapp
-cd .\myjavaapp\
-git remote -v
+cd Base
+git clone https://github.com/email4prasanth/ADO_Agent.git
+git clone https://github.com/email4prasanth/AI_Infra.git
+```
+- Use this code and do necessary modification create a new folder
+```
 Remove git form the folder since we dont wont to push to git repo
 git status
 git init
+
+git remote -v
+git remote add  origin https://reachai@dev.azure.com/reachai/AzureTerraform/_git/AzureTerraform
+git checkout -b feature/intial-setup
 ```
 <!-- - 06 ado-repo image -->
 ### Push code to AzureDevOps repo 
 <!-- - image -->
 ```
-git add .; git commit -m “java based code”
+git add .; git commit -m "Base code is commited"
 git branch
 git remote add origin <>
 git remote -v
-git push origin master
+git push origin feature/intial-setup
 
 ```
-- It will ask ID and password, Check the code is available or not, Then go to pipelines-54:38
-- There are two types of pipelines
-    - YAML Pipelines
-    - Classic Pipelines is in GUI format only and in YAML format only in repo
-- IQ: Ask to write YAML file
-- open project settings -- agent pools -- LinuxAgentPool -- capabilites `AWS:YES` and AzureAgentPool -- capabilites `AZURE:YES`
-- 57:09 - Creating a pipeline
-pipelines- Create pipeline - azure repo git - myapp - starter pipeline
-Check-1
-Loop name: LinuxAgentPool
-Demands -https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/pool-demands?view=azure-pipelines
-- `AWS -equals YES` and with agent name - 1:00:40(49:50)
-- 1:05:00 - the agents are working properly
-    <!-- - 08-listening job -->
-Check-2
-Loop name: AzureAgentPool
-Demands -
-- `AZURE -equals YES` and with agent name 
-- 1:05:00 - the agents are working properly
-    <!-- - 08-listening job -->
-
+- Now create yml file to create infra lec-63, 7:57
+- Store the secrtes under library variable group with name `AZURE_ACESS_GROUP_DEV`and  integrate with azure keyvault.
+- Establish connection ADO to Azure cloud, go to organisation --> project --> project settings--> under the Pipelines section service connections-->connection type (Azure Resource Manager).
+    - Identity type: App registration
+    - Credential: Workload identity federation
+    - Scope level: Subscription
+    - Connection Name: ADOtoAzure
+- once the connection is done, open azure kv add the key value pair then go to access policies -> create select permission -- choose key secrets & certificate manager --> principal -->  choose the connection and create.
+- now open `AZURE_ACESS_GROUP_DEV` enable link from azure, provide subscription and keyvault name, resfresh click on add you will see the secrets.
