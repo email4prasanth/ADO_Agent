@@ -11,7 +11,7 @@ Organize our [Azure Repos](https://azure.com) directory structure to enforce str
 ai_infra/
 ├── .gitignore
 ├── azure-pipelines.yml             # Main multi-stage pipeline configuration
-├── ReadMe.md             # Overview of the current repo
+├── ReadMe.md                       # Overview of the current repo
 ├── templates/                      
 │   └── terraform-steps.yml         # Reusable step definitions (init, plan, apply)
 └── ai_infra/
