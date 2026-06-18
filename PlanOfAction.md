@@ -5,77 +5,221 @@ This Plan of Action (POA) delivers a production-ready, multi-stage architecture 
 ---
 
 ## 🏗️ 1. Project Directory & Workspace Layout
-Organize your [Azure Repos](https://microsoft.com) directory structure to enforce separation of concerns across your environments (**dev**, **qa**, **prod**).
+Organize your [Azure Repos](https://azure.com) directory structure to enforce strict separation of concerns using your defined module scheme.
 
 ```text
 ai_infra/
-.
 ├── .gitignore
-├── azure-pipelines.yml             
+├── azure-pipelines.yml             # Main multi-stage pipeline configuration
 ├── templates/                      
-│   └── terraform-steps.yml
+│   └── terraform-steps.yml         # Reusable step definitions (init, plan, apply)
 └── ai_infra/
     └── backend-infra/
-        ├── local.tf
-        ├── network.tf
-        ├── outputs.tf
-        ├── provider.tf
-        ├── resource_group.tf
-        ├── security_group.tf
-        └── vm.tf 
+        ├── local.tf                # Local variable evaluation and maps
+        ├── network.tf              # VNet, Subnets, and Private Endpoints
+        ├── outputs.tf              # Resource IDs and connection strings
+        ├── provider.tf             # AzureRM & AzureAD provider configurations
+        ├── resource_group.tf       # Environment-scoped lifecycle groups
+        ├── security_group.tf       # Network Security Groups (NSG) and firewall rules
+        ├── vm.tf                   # Virtual Machine module mapping
+        ├── main.tf                 # Component orchestration (KV, SWA, APIM, Redis, Postgres, Front Door)
+        └── variables.tf            # Variable declarations (environment, location, SKUs)
 ```
 
 ---
 
 ## 🔒 2. Prerequisites & Remote State Setup
-Configure central control plane in Azure and Azure DevOps before executing any automation.
-### Azure cloud level
-0. Fix the region where to host the resources.
-1. Cost Analysis and resource list
-2. Dediated Resource group to 
- - Create Virtual machine for AzureDevOps Agent.
- - Key vault as contirbutor access to manage long-lived client secrets in Azure DevOps.
-3. Dediated Resource group for Storage Account to store terraform state file for
-  - development environment
-  - qa environment
-  - prod environmnet
+Configure your central control plane in Azure and Azure DevOps before initiating automation tasks.
 
+### Azure Cloud Level
+* **0. Region Lockdown**: Select a primary target region (e.g., `East US`) to establish data residency and low-latency peering.
+* **1. Cost & Discovery Planning**: Establish enterprise subscription spending limits and create an initial inventory spreadsheet of required SKUs.
+* **2. Core Management Resource Group (`rg-inlogicai-mgmt`)**:
+  * **Self-Hosted DevOps Agent**: Provision a dedicated Ubuntu/Windows VM (Minimum specs: **2 vCPU, 8GB RAM**) configured with the Azure DevOps agent pool runtime.
+  * **Bootstrap Key Vault**: Deploy an access-controlled Key Vault to securely manage long-lived service principal client secrets and administrative infrastructure keys.
+* **3. State Management Storage Resource Group (`rg-inlogicai-tfstate`)**:
+  * Create a unified, geo-redundant Azure Storage Account containing three separate access-isolated blob containers to store environment-specific state records:
+    * `dev.terraform.tfstate`
+    * `qa.terraform.tfstate`
+    * `prod.terraform.tfstate`
 
-### AzureDevOps level
-- Name of the Repository under organisation.
-- Naming convention of environmnets and branches.
-- Brach protection rules.
-- 
+### Azure DevOps Level
+* **Repository Architecture**: Provision a single target Git repository under your enterprise organization workspace.
+* **Branching Model**: Standardize your feature delivery workflow across three core environment branches: `dev`, `qa`, and `main` (Production).
+* **Branch Protection Policies**: Enforce strict peer code reviews (Pull Requests) on `qa` and `main` branches. Require a successful Terraform validation and structural plan build run before merging code.
+
+### Trust Relations & Authentication (Handshake)
+* Create an **Azure Service Principal (SPN)** or utilize **Workload Identity Federation (OIDC)** within Azure Active Directory.
+* Configure a secure **Azure Resource Manager Service Connection** inside Azure DevOps Project Settings using these credentials.
+* Grant this Service Principal **Contributor** and **User Access Administrator** roles on target subscriptions, alongside explicit **Key Vault Secrets Officer** permissions to manage infrastructure workflows smoothly.
+
 ---
 
 ## 🛠️ 3. Resource Group & Naming Strategy
-To manage costs and policies, organize your resources into lifecycle-specific Resource Groups **Environment-ProjectName-ResourceName**.
+Enforce standard corporate governance across all provisioned modules using the definitive structural format: **Environment-ProjectName-ResourceName**.
 
-┌───► [dev-inlogicai-rg]  ───► (Dev Stack: Low-cost SKUs)
-┼───► [qa-inlogicai-rg]   ───► (QA Stack: Testing Baseline)
-└───► [prod-inlogicai-rg] ───► (Prod Stack: HA / Zone Redundant)
+```sh
+┌───► [dev-inlogicai-rg]  ───► (Dev Stack: Low-cost SKUs, Single-instance DB)
+┼───► [qa-inlogicai-rg]   ───► (QA Stack: Mirror of production baseline, lower tiers)
+└───► [prod-inlogicai-rg] ───► (Prod Stack: Multi-zone High Availability, Premium Tiers)
+```
+
 ---
 
 ## 📝 4. Terraform Core Module Engineering
-Design your local modules inside the `/modules` directory according to these architectural guidelines:
+Map your foundational configuration blocks inside the `ai_infra/backend-infra/` path to meet these standard enterprise requirements:
 
 | Resource Type | Service Core Configuration Requirements |
 | :--- | :--- |
-| **Networking Hub** | **Azure Front Door Premium** handles global CDN routing, TLS termination, and Web Application Firewall (WAF) rule sets. Traffic routes directly to **API Management (APIM)** and the **Static Web App** backends. |
-| **Secrets & Keys** | **Azure Key Vault** deployed first with `purge_protection_enabled = true`. Other modules store runtime secrets (e.g., Postgres passwords, Redis connection strings) here via managed identity access. |
-| **Compute Engine** | **Azure Virtual Machine** configured with custom SSH keys and an isolated network security group (NSG) that allows ingress *only* from verified application jumpboxes. |
+| **Networking Hub** | **Azure Front Door Premium** handles global CDN routing, TLS termination, and WAF rules. Traffic routes to **API Management (APIM)** and **Static Web App** backends. |
+| **Secrets & Keys** | **Azure Key Vault** deployed first with `purge_protection_enabled = true`. Modules store database passwords and keys via managed identity access. |
+| **Compute Engine** | **Azure Virtual Machine** configured with custom SSH keys and an isolated network security group (NSG) allowing ingress only from verified jumpboxes. |
 | **Web UI** | **Azure Static Web App** tied to standard SKUs with customized staging environments for QA validation checks. |
-| **Storage & Images** | **Azure Blob Storage** for application assets (configured with private endpoints) and **Azure Container Registry (ACR)** running the Premium tier for automated geo-replication. |
+| **Storage & Images** | **Azure Blob Storage** for assets (with private endpoints) and **Azure Container Registry (ACR)** running the Premium tier for geo-replication. |
 | **Data Layer** | **Azure Managed PostgreSQL (Flexible Server)** with High Availability enabled for `prod`, and **Azure Cache for Redis** for session optimization. Both use private endpoints. |
 | **Observability** | **Azure Monitor** containing a unified Log Analytics Workspace. Diagnostic settings on all modules track logs and metrics. |
 
 ---
+
+## 🚀 5. Multi-Stage Azure DevOps Pipeline
+Implement this branch-conditional layout within your root `azure-pipelines.yml` file to handle progression across environments safely.
+
+```yaml
+trigger:
+  branches:
+    include:
+      - dev
+      - qa
+      - main
+
+variables:
+  - name: terraformWorkingDir
+    value: '\$(System.DefaultWorkingDirectory)/ai_infra/backend-infra'
+  - name: poolName
+    value: 'Your-SelfHosted-Agent-Pool' # Utilizes the 2 CPU, 8GB RAM custom VM agent
+
+stages:
+# ==========================================
+# DEVELOPMENT LIFECYCLE
+# ==========================================
+- stage: Dev_Plan
+  displayName: 'Dev: Generate Structural Plan'
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+  jobs:
+  - job: Plan
+    pool: \$(poolName)
+    steps:
+    - template: templates/terraform-steps.yml
+      parameters:
+        command: 'plan'
+        environment: 'dev'
+
+- stage: Dev_Apply
+  displayName: 'Dev: Deploy Infrastructure'
+  dependsOn: Dev_Plan
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
+  jobs:
+  - deployment: Apply
+    pool: \$(poolName)
+    environment: 'Infrastructure-Dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: templates/terraform-steps.yml
+            parameters:
+              command: 'apply'
+              environment: 'dev'
+
+# ==========================================
+# QA LIFECYCLE
+# ==========================================
+- stage: QA_Plan
+  displayName: 'QA: Generate Structural Plan'
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/qa')
+  jobs:
+  - job: Plan
+    pool: \$(poolName)
+    steps:
+    - template: templates/terraform-steps.yml
+      parameters:
+        command: 'plan'
+        environment: 'qa'
+
+- stage: QA_Apply
+  displayName: 'QA: Deploy Infrastructure'
+  dependsOn: QA_Plan
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/qa'))
+  jobs:
+  - deployment: Apply
+    pool: \$(poolName)
+    environment: 'Infrastructure-QA'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: templates/terraform-steps.yml
+            parameters:
+              command: 'apply'
+              environment: 'qa'
+
+# ==========================================
+# PRODUCTION LIFECYCLE
+# ==========================================
+- stage: Prod_Plan
+  displayName: 'Prod: Generate Structural Plan'
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+  jobs:
+  - job: Plan
+    pool: \$(poolName)
+    steps:
+    - template: templates/terraform-steps.yml
+      parameters:
+        command: 'plan'
+        environment: 'prod'
+
+- stage: Prod_Apply
+  displayName: 'Prod: Deploy Infrastructure'
+  dependsOn: Prod_Plan
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: Apply
+    pool: \$(poolName)
+    environment: 'Infrastructure-Prod' # Governed by manual environment approvals
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: templates/terraform-steps.yml
+            parameters:
+              command: 'apply'
+              environment: 'prod'
+```
+
+---
 ## 🚀 5. Multi-Stage Azure DevOps Pipeline
 Implement this YAML layout within `.azure-pipelines/azure-pipelines.yml`.
----
-## 🔒 6. Governance & Environment Controls
-Protect your production workload by configuring guardrails directly inside [Azure DevOps Environments](https://microsoft.com).
+```sh
+trigger:
+  branches:
+    include:
+      - dev
+      - qa
+      - main
 
-* **Manual Approvals**: Navigate to **Pipelines** ➡️ **Environments** ➡️ **Infrastructure-Prod**. Add a **Check** requiring explicit sign-off from team leads or a Release Manager before execution.
-* **Exclusive Lock**: Enable the Exclusive Lock check on Production to ensure only a single pipeline run updates the infrastructure state at any given time.
-* **Branch Restrictions**: Restrict deployment permissions for the QA and Production environments to runs originating from the `refs/heads/main` branch.
+stages:
+- stage: Dev_Plan
+- stage: Dev_Apply
+- stage: QA_Plan
+- stage: QA_Apply
+- stage: Prod_Plan
+- stage: Prod_Apply
+```
+---
+
+## 🔒 6. Governance & Environment Controls
+Protect your environment workloads by configuring guardrails directly inside [Azure DevOps Environments](https://azure.com).
+
+* **Manual Approvals**: Configure **Pipelines** ➡️ **Environments** ➡️ **Infrastructure-Prod**. Add an approval check requiring sign-off from your Release Manager or Lead Architect before executing `Prod_Apply`.
+* **Exclusive Lock**: Enable the Exclusive Lock check on **Infrastructure-QA** and **Infrastructure-Prod** environments to prevent state corruption from overlapping concurrent pipeline runs.
+* **Branch Restrictions**: Explicitly restrict deployment permissions on your QA and Production environments, limiting execution solely to matching target branch runs (`refs/heads/qa` and `refs/heads/main`).
