@@ -1,11 +1,11 @@
 # Plan of Action: Automated Infrastructure Provisioning via Azure DevOps & Terraform
 
-This Plan of Action (POA) delivers a production-ready, multi-stage architecture blueprint to provision your specific Azure stack across **Development**, **QA**, and **Production** environments using **Terraform** and **Azure DevOps Pipelines**.
+This Plan of Action (POA) delivers a production-ready, multi-stage architecture blueprint to provision our specific Azure stack across **Development**, **QA**, and **Production** environments using **Terraform** and **Azure DevOps Pipelines**.
 
 ---
 
 ## 🏗️ 1. Project Directory & Workspace Layout
-Organize your [Azure Repos](https://azure.com) directory structure to enforce strict separation of concerns using your defined module scheme.
+Organize our [Azure Repos](https://azure.com) directory structure to enforce strict separation of concerns using our defined module scheme.
 
 ```text
 ai_infra/
@@ -29,7 +29,7 @@ ai_infra/
 ---
 
 ## 🔒 2. Prerequisites & Remote State Setup
-Configure your central control plane in Azure and Azure DevOps before initiating automation tasks.
+Configure our central control plane in Azure and Azure DevOps before initiating automation tasks.
 
 ### Azure Cloud Level
 * **0. Region Lockdown**: Select a primary target region (e.g., `East US`) to establish data residency and low-latency peering.
@@ -44,8 +44,8 @@ Configure your central control plane in Azure and Azure DevOps before initiating
     * `prod.terraform.tfstate`
 
 ### Azure DevOps Level
-* **Repository Architecture**: Provision a single target Git repository under your enterprise organization workspace.
-* **Branching Model**: Standardize your feature delivery workflow across three core environment branches: `dev`, `qa`, and `main` (Production).
+* **Repository Architecture**: Provision a single target Git repository under our enterprise organization workspace.
+* **Branching Model**: Standardize our feature delivery workflow across three core environment branches: `dev`, `qa`, and `main` (Production).
 * **Branch Protection Policies**: Enforce strict peer code reviews (Pull Requests) on `qa` and `main` branches. Require a successful Terraform validation and structural plan build run before merging code.
 
 ### Trust Relations & Authentication (Handshake)
@@ -67,7 +67,7 @@ Enforce standard corporate governance across all provisioned modules using the d
 ---
 
 ## 📝 4. Terraform Core Module Engineering
-Map your foundational configuration blocks inside the `ai_infra/backend-infra/` path to meet these standard enterprise requirements:
+Map our foundational configuration blocks inside the `ai_infra/backend-infra/` path to meet these standard enterprise requirements:
 
 | Resource Type | Service Core Configuration Requirements |
 | :--- | :--- |
@@ -82,123 +82,8 @@ Map your foundational configuration blocks inside the `ai_infra/backend-infra/` 
 ---
 
 ## 🚀 5. Multi-Stage Azure DevOps Pipeline
-Implement this branch-conditional layout within your root `azure-pipelines.yml` file to handle progression across environments safely.
+Implement this branch-conditional layout within our root `azure-pipelines.yml` file to handle progression across environments safely.
 
-```yaml
-trigger:
-  branches:
-    include:
-      - dev
-      - qa
-      - main
-
-variables:
-  - name: terraformWorkingDir
-    value: '\$(System.DefaultWorkingDirectory)/ai_infra/backend-infra'
-  - name: poolName
-    value: 'Your-SelfHosted-Agent-Pool' # Utilizes the 2 CPU, 8GB RAM custom VM agent
-
-stages:
-# ==========================================
-# DEVELOPMENT LIFECYCLE
-# ==========================================
-- stage: Dev_Plan
-  displayName: 'Dev: Generate Structural Plan'
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
-  jobs:
-  - job: Plan
-    pool: \$(poolName)
-    steps:
-    - template: templates/terraform-steps.yml
-      parameters:
-        command: 'plan'
-        environment: 'dev'
-
-- stage: Dev_Apply
-  displayName: 'Dev: Deploy Infrastructure'
-  dependsOn: Dev_Plan
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
-  jobs:
-  - deployment: Apply
-    pool: \$(poolName)
-    environment: 'Infrastructure-Dev'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: templates/terraform-steps.yml
-            parameters:
-              command: 'apply'
-              environment: 'dev'
-
-# ==========================================
-# QA LIFECYCLE
-# ==========================================
-- stage: QA_Plan
-  displayName: 'QA: Generate Structural Plan'
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/qa')
-  jobs:
-  - job: Plan
-    pool: \$(poolName)
-    steps:
-    - template: templates/terraform-steps.yml
-      parameters:
-        command: 'plan'
-        environment: 'qa'
-
-- stage: QA_Apply
-  displayName: 'QA: Deploy Infrastructure'
-  dependsOn: QA_Plan
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/qa'))
-  jobs:
-  - deployment: Apply
-    pool: \$(poolName)
-    environment: 'Infrastructure-QA'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: templates/terraform-steps.yml
-            parameters:
-              command: 'apply'
-              environment: 'qa'
-
-# ==========================================
-# PRODUCTION LIFECYCLE
-# ==========================================
-- stage: Prod_Plan
-  displayName: 'Prod: Generate Structural Plan'
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-  jobs:
-  - job: Plan
-    pool: \$(poolName)
-    steps:
-    - template: templates/terraform-steps.yml
-      parameters:
-        command: 'plan'
-        environment: 'prod'
-
-- stage: Prod_Apply
-  displayName: 'Prod: Deploy Infrastructure'
-  dependsOn: Prod_Plan
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  jobs:
-  - deployment: Apply
-    pool: \$(poolName)
-    environment: 'Infrastructure-Prod' # Governed by manual environment approvals
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: templates/terraform-steps.yml
-            parameters:
-              command: 'apply'
-              environment: 'prod'
-```
-
----
-## 🚀 5. Multi-Stage Azure DevOps Pipeline
-Implement this YAML layout within `.azure-pipelines/azure-pipelines.yml`.
 ```sh
 trigger:
   branches:
@@ -208,18 +93,27 @@ trigger:
       - main
 
 stages:
+# ==========================================
+# DEVELOPMENT LIFECYCLE
+# ==========================================
 - stage: Dev_Plan
 - stage: Dev_Apply
+# ==========================================
+# QA LIFECYCLE
+# ==========================================
 - stage: QA_Plan
 - stage: QA_Apply
+# ==========================================
+# PRODUCTION LIFECYCLE
+# ==========================================
 - stage: Prod_Plan
 - stage: Prod_Apply
 ```
 ---
 
 ## 🔒 6. Governance & Environment Controls
-Protect your environment workloads by configuring guardrails directly inside [Azure DevOps Environments](https://azure.com).
+Protect our environment workloads by configuring guardrails directly inside [Azure DevOps Environments](https://azure.com).
 
-* **Manual Approvals**: Configure **Pipelines** ➡️ **Environments** ➡️ **Infrastructure-Prod**. Add an approval check requiring sign-off from your Release Manager or Lead Architect before executing `Prod_Apply`.
+* **Manual Approvals**: Configure **Pipelines** ➡️ **Environments** ➡️ **Infrastructure-Prod**. Add an approval check requiring sign-off from our Release Manager or Lead Architect before executing `Prod_Apply`.
 * **Exclusive Lock**: Enable the Exclusive Lock check on **Infrastructure-QA** and **Infrastructure-Prod** environments to prevent state corruption from overlapping concurrent pipeline runs.
-* **Branch Restrictions**: Explicitly restrict deployment permissions on your QA and Production environments, limiting execution solely to matching target branch runs (`refs/heads/qa` and `refs/heads/main`).
+* **Branch Restrictions**: Explicitly restrict deployment permissions on our QA and Production environments, limiting execution solely to matching target branch runs (`refs/heads/qa` and `refs/heads/main`).
