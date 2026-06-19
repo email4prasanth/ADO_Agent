@@ -7,7 +7,7 @@ This Plan of Action (POA) delivers a production-ready, multi-stage architecture 
 ## 🏗️ 1. Project Directory & Workspace Layout
 Organize our [Azure Repos](https://azure.com) directory structure to enforce strict separation of concerns using our defined module scheme.
 
-```text
+```text 
 ai_infra/
 ├── .gitignore
 ├── azure-pipelines.yml             # Main multi-stage pipeline configuration
@@ -22,7 +22,7 @@ ai_infra/
         ├── provider.tf             # AzureRM & AzureAD provider configurations
         ├── resource_group.tf       # Environment-scoped lifecycle groups
         ├── security_group.tf       # Network Security Groups (NSG) and firewall rules
-        ├── vm.tf                   # Virtual Machine module mapping
+        ├── aks.tf                   # Virtual Machine module mapping
         ├── main.tf                 # Component orchestration (KV, SWA, APIM, Redis, Postgres, Front Door)
         └── variables.tf            # Variable declarations (environment, location, SKUs)
 ```
@@ -94,6 +94,8 @@ trigger:
       - main
 
 stages:
+- stage: Validate
+- stage: Security Scan
 # ==========================================
 # DEVELOPMENT LIFECYCLE
 # ==========================================
@@ -119,3 +121,10 @@ Protect our environment workloads by configuring guardrails directly inside [Azu
 * **Exclusive Lock**: Enable the Exclusive Lock check on **Infrastructure-QA** and **Infrastructure-Prod** environments to prevent state corruption from overlapping concurrent pipeline runs.
 * **Branch Restrictions**: Explicitly restrict deployment permissions on our QA and Production environments, limiting execution solely to matching target branch runs (`refs/heads/qa` and `refs/heads/main`).
 * **Server Privilage** and **Database Privilage** are set at different levels manager(Readonly), devops, developers (read and write) access.
+
+| Role            | Infrastructure | Database              | Key Vault       |
+| --------------- | -------------- | --------------------- | --------------- |
+| Manager         | Reader         | Read Only             | Reader          |
+| Developer       | Reader         | Read/Write (Dev & QA) | Secrets User    |
+| DevOps Engineer | Contributor    | Admin                 | Secrets Officer |
+| Architect       | Owner          | Admin                 | Administrator   |

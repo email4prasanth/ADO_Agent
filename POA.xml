@@ -1,0 +1,194 @@
+<mxfile host="draw.io" modified="2026-06-19T00:00:00.000Z" agent="Mozilla/5.0" version="24.0.0" etag="user-flow-diagram" type="device">
+  <diagram name="User Flow Diagram" id="user-flow">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- User Icon -->
+        <mxCell id="user" value="👤 User" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;align=center;verticalAlign=middle;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="360" width="120" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow User to Front Door -->
+        <mxCell id="arrow-user-frontdoor" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0066CC;endArrow=classic;endFill=1;" edge="1" parent="1" source="user" target="frontdoor">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="250" y="390"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-user-frontdoor" value="HTTPS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="370" width="60" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Azure Front Door -->
+        <mxCell id="frontdoor" value="🌐 Azure Front Door&#xa;Premium" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=13;align=center;verticalAlign=middle;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="340" width="160" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Front Door Details -->
+        <mxCell id="frontdoor-details" value="• CDN Routing&#xa;• TLS Termination&#xa;• WAF Policies" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#d6b656;fontSize=10;align=left;verticalAlign=top;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="340" width="150" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="frontdoor-detail-connect" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;endArrow=none;" edge="1" parent="1" source="frontdoor" target="frontdoor-details">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow Front Door to APIM -->
+        <mxCell id="arrow-frontdoor-apim" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#009900;endArrow=classic;endFill=1;" edge="1" parent="1" source="frontdoor" target="apim">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="540" y="390"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-frontdoor-apim" value="Route" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="370" width="60" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- API Management -->
+        <mxCell id="apim" value="🔌 API Management&#xa;(APIM)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=13;align=center;verticalAlign=middle;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="340" width="160" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- APIM Details -->
+        <mxCell id="apim-details" value="• API Gateway&#xa;• Rate Limiting&#xa;• Authentication" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3edf5;strokeColor=#9673a6;fontSize=10;align=left;verticalAlign=top;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="340" width="150" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="apim-detail-connect" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#9673a6;dashed=1;endArrow=none;" edge="1" parent="1" source="apim" target="apim-details">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow APIM to Backend -->
+        <mxCell id="arrow-apim-backend" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#CC4400;endArrow=classic;endFill=1;" edge="1" parent="1" source="apim" target="backend">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="520"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-apim-backend" value="API Calls" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="490" width="80" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Backend Services -->
+        <mxCell id="backend" value="⚙️ Backend Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;align=center;verticalAlign=middle;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="550" width="280" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Backend Services Details -->
+        <mxCell id="backend-details" value="• Virtual Machines&#xa;• Container Registry (ACR)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf5e9;strokeColor=#82b366;fontSize=10;align=left;verticalAlign=top;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="545" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="backend-detail-connect" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#82b366;dashed=1;endArrow=none;" edge="1" parent="1" source="backend" target="backend-details">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow Backend to Database -->
+        <mxCell id="arrow-backend-database" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9900CC;endArrow=classic;endFill=1;" edge="1" parent="1" source="backend" target="database">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="650"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-backend-database" value="SQL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="630" width="60" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Database Layer -->
+        <mxCell id="database" value="🗄️ Database Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=13;align=center;verticalAlign=middle;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="670" width="280" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Database Details -->
+        <mxCell id="database-details" value="• PostgreSQL Flexible Server&#xa;• Azure Cache for Redis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce8e7;strokeColor=#b85450;fontSize=10;align=left;verticalAlign=top;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="665" width="170" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="database-detail-connect" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#b85450;dashed=1;endArrow=none;" edge="1" parent="1" source="database" target="database-details">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Response Flow (Reverse arrows) -->
+        <mxCell id="arrow-database-backend-response" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#666666;endArrow=classic;endFill=1;dashed=1;dashPattern=5 5;" edge="1" parent="1" source="database" target="backend">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="530" y="700"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow-backend-apim-response" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#666666;endArrow=classic;endFill=1;dashed=1;dashPattern=5 5;" edge="1" parent="1" source="backend" target="apim">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="550" y="580"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow-apim-frontdoor-response" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#666666;endArrow=classic;endFill=1;dashed=1;dashPattern=5 5;" edge="1" parent="1" source="apim" target="frontdoor">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="460"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow-frontdoor-user-response" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#666666;endArrow=classic;endFill=1;dashed=1;dashPattern=5 5;" edge="1" parent="1" source="frontdoor" target="user">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="270" y="460"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Response Labels -->
+        <mxCell id="label-response" value="Response" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontStyle=2;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="500" y="740" width="70" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;dashed=1;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="760" width="400" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="765" width="60" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Legend items -->
+        <mxCell id="legend-request" value="───── Request Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="100" y="785" width="130" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-response" value="- - - Response Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="250" y="785" width="130" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-private" value="🔒 Private Endpoints" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#CC4400;" vertex="1" parent="1">
+          <mxGeometry x="400" y="785" width="130" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Add Private Endpoint indicators -->
+        <mxCell id="private-endpoint-1" value="🔒" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="620" y="595" width="30" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="private-endpoint-2" value="🔒" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="520" y="685" width="30" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Color code background for security zones -->
+        <mxCell id="dmz-zone" value="DMZ Zone" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#d6b656;opacity=15;fontStyle=1;fontSize=11;align=center;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="280" y="320" width="540" height="120" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="app-zone" value="Application Zone" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82b366;opacity=15;fontStyle=1;fontSize=11;align=center;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="560" y="530" width="290" height="90" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="data-zone" value="Data Zone" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#b85450;opacity=15;fontStyle=1;fontSize=11;align=center;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="560" y="650" width="290" height="90" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
